@@ -1,0 +1,4 @@
+**/__pycache__
+.*env
+models/
+docker-compose.yml

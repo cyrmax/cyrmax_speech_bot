@@ -1,0 +1,38 @@
+# Fill inn all the necessary data and rename this file to "docker-compose.yml"
+# After that run "docker-compose up -d" to start the bot.
+
+version: "3"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodbdata:/data/db # Before the colon, provide the path in the host system where the bot's mongo database service will store its persistent content. Also you can leave it as it is for Docker Engine to create the volume in the default location.
+    environment:
+      MONGODB_DATA_DIR: /data/db
+    networks:
+      - voicebotnet
+  bot:
+    image: cyrmax/cyrmaxspeechbot
+    container_name: bot
+    restart: unless-stopped
+    volumes:
+      - ./models:/app/models # Before the colon, provide the path in the host system where vosk recognition models will be stored. Be warned that you should download and extract the models before running the bot.
+    depends_on:
+      - mongodb
+    environment:
+      BOT_TOKEN: "<telegram_bot_token>" # Provide telegram bot token. Do not remove the quotes.
+      MODEL_NAME: "vosk-model-small-ru-0.22" # Provide vosk recognition model name that will be used by default when bot starts. Do not remove the quotes.
+    networks:
+      - voicebotnet
+
+networks:
+  voicebotnet:
+    driver: bridge
+
+# Remove the following section if you have provided the custom volume path for mongo database.
+volumes:
+  mongodbdata:
+    driver: local
